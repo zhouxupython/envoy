@@ -113,11 +113,14 @@ class ConnectedCommand(object):
         self.std_out = std_out
         self.std_err = std_out
         self._status_code = None
+        print '1'
 
     def __enter__(self):
+        print '__enter__'
         return self
 
     def __exit__(self, type, value, traceback):
+        print '__exit__'
         self.kill()
 
     @property
@@ -125,28 +128,36 @@ class ConnectedCommand(object):
         """The status code of the process.
         If the code is None, assume that it's still running.
         """
+        print 'status_code, _status_code: ', self._status_code
         return self._status_code
 
     @property
     def pid(self):
         """The process' PID."""
+        print 'pid'
         return self._process.pid
 
     def kill(self):
         """Kills the process."""
+        print 'kill'
         return self._process.kill()
 
     def expect(self, bytes, stream=None):
         """Block until given bytes appear in the stream."""
+        print 'expect'
         if stream is None:
             stream = self.std_out
 
     def send(self, str, end='\n'):
         """Sends a line to std_in."""
-        return self._process.stdin.write(str+end)
+        print 'send'
+        #return self._process.stdin.write(str+end)
+        self.std_out, self.std_err = self._process.communicate(str+end)
+        self._status_code = self._process.returncode
 
     def block(self):
         """Blocks until command finishes. Returns Response instance."""
+        print 'block'
         self._status_code = self._process.wait()
 
 
@@ -239,6 +250,8 @@ def connect(command, data=None, env=None, cwd=None):
     command_str = expand_args(command).pop()
     environ = dict(os.environ)
     environ.update(env or {})
+    
+    print '\ncommand_str: ', command_str
 
     process = subprocess.Popen(command_str,
         universal_newlines=True,
@@ -250,5 +263,10 @@ def connect(command, data=None, env=None, cwd=None):
         bufsize=0,
         cwd=cwd,
     )
+    print '0'
+    print 'process return_code: ', process.returncode
+    print '0'
+    # process.communicate()
+    # print '00'
 
     return ConnectedCommand(process=process)
