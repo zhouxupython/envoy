@@ -155,6 +155,36 @@ class ConnectedCommand(object):
         self.std_out, self.std_err = self._process.communicate(str+end)
         self._status_code = self._process.returncode
 
+# if send function want to use     return self._process.stdin.write(str+end)
+# maybe will be read the stdout in another thread, such as in subprocess.py
+# if not, use self._process.stdout.read() will cause block
+#
+# def _readerthread(self, fh, buffer):
+#             buffer.append(fh.read())
+#             fh.close()
+# 
+# def _communicate(self, input, endtime, orig_timeout):
+#     # Start reader threads feeding into a list hanging off of this
+#     # object, unless they've already been started.
+#     if self.stdout and not hasattr(self, "_stdout_buff"):
+#         self._stdout_buff = []
+#         self.stdout_thread = \
+#                 threading.Thread(target=self._readerthread,
+#                                  args=(self.stdout, self._stdout_buff))
+#         self.stdout_thread.daemon = True
+#         self.stdout_thread.start()
+#     
+#     stdout = None
+#     stderr = None
+#     if self.stdout:
+#         stdout = self._stdout_buff
+        
+        
+        
+        
+        
+        
+        
     def block(self):
         """Blocks until command finishes. Returns Response instance."""
         print 'block'
